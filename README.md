@@ -19,7 +19,7 @@ Cómo Ejecutarlo
 Clona el repositorio desde GitHub
 
 ```bash
-git clone https://github.com/TU_USUARIO/TU_PROYECTO.git
+git clone git@github.com:FoxntaU/HireSecure.git
 ```
 
 ## Backend
