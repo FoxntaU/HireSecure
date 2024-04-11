@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     company: {
         type: String,
         default: null
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'contractor'],
+        default: 'contractor'
     }
 });
 
@@ -37,7 +42,6 @@ userSchema.pre('save', async function (next) {
         if (!this.isModified('password')) {
             return next();
         }
-
         const hashedPassword = await bcrypt.hash(this.password, 10);
         this.password = hashedPassword;
         next();
