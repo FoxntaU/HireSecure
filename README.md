@@ -31,7 +31,7 @@ npm install
 Crea un archivo .env en la raíz del proyecto y agrega la siguiente configuración (reemplaza TU_MONGODB_URI por tu URI de MongoDB):
 
 ```bash
-MONGODB_URI=TU_MONGODB_URI
+mongodb_uri=TU_MONGODB_URI
 ```
 
 
