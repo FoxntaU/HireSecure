@@ -21,7 +21,7 @@ export default function Validar() {
     <div className="min-h-screen">
       <div className="flex flex-col justify-center content-center items-center">
         <h1 className="font-extrabold text-blue-950 text-4xl text-center my-10">
-          Verifica facilmente nuestros canales de comunicación
+          Verifica facilmente nuestrosafdsdfs canales de comunicación
         </h1>
         <div className="mb-4">
           <InputOTP maxLength={6} onComplete={onCompleteOtp}>

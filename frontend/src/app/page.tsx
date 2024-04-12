@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { useCookies } from 'next-client-cookies';
 
 export default function Home() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const cookies = useCookies();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,9 +33,11 @@ export default function Home() {
         title: "Inicio de sesión exitoso",
         description: "Bienvenido a HireSecure",
       })
-      setLoading(false);
 
-      // TODO: Redirect to dashboard
+      const data = await response.json();
+
+      cookies.set("token", data.token);
+      router.push("/generar");
     } else {
       // Handle errors
       toast({
