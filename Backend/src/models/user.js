@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
     contactNumber: {
         type: String
     },
-    employed: {
-        type: Boolean,
-        default: false
-    },
     company: {
         type: String,
         default: null

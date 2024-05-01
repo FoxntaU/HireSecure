@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const tokenSchema = new mongoose.Schema({
     token: {
+        type: String,
+        required: true
+    },
+    company: {
         type: String,
         required: true
     },
@@ -9,12 +14,25 @@ const tokenSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    generatedBy: {
+    medium: {
         type: String,
         required: true
     },
-    contactMethod: {
+    subject: {
         type: String,
+        required: true
+    },
+    expirationDate: {
+        type: Date,
+        required: true
+    },
+    expirationTime: {
+        type: String,
+        required: true
+    },
+    generatedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', // Referencia al modelo User
         required: true
     },
     createdAt: {
