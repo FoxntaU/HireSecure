@@ -53,18 +53,12 @@ class Publisher {
         });
     
         expiredTokens.forEach(async (token) => {
-            const tokenExpirationDate = DateTime.fromISO(token.expirationDate);
-            console.log('tokenExpirationDate:', tokenExpirationDate);
-            
-            // necesito que la fecha sea comparable para usarla en el if de abajo  
-            if (tokenExpirationDate.equals(currentDate)) {
-                console.log('Token expirado fecha es igual a la actual');
-            }
-    
+            const tokenExpirationDate = token.expirationDate.toISOString();
+            const datetoken = tokenExpirationDate.substring(0, 10); 
+
             const [expirationHour, expirationMinute] = token.expirationTime.split(':').map(Number);
             
-            // en este if
-            if ((token.expirationDate < currentDate.toISODate()) || (expirationHour < currentDate.hour || (expirationHour === currentDate.hour && expirationMinute <= currentDate.minute))) {
+            if ((datetoken < currentDate.toISODate()) || expirationHour < currentDate.hour || (expirationHour === currentDate.hour && expirationMinute <= currentDate.minute)) {
                 this.subscribers.forEach(callback => callback(token));
             }
         });
