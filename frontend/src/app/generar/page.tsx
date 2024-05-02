@@ -59,7 +59,8 @@ export default function Generar() {
         title: "Generacion de codigo exitoso"
       })
       const data = await response.json();
-     
+      router.push(`/code?token=${data.token}`);
+
     } else {
       // Handle errors
       console.log(response);

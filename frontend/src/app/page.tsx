@@ -49,7 +49,7 @@ export default function Home() {
     }
   }
   return (
-    <form className="flex justify-between  min-h-screen items-center" onSubmit={handleSubmit}>
+    <form className="flex justify-between min-h-screen items-center" onSubmit={handleSubmit}>
       <div className="">
         <h1 className="text-7xl text-blue-950 font-extrabold max-w-lg">
           Bienvenido a HireSecure
