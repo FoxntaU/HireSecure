@@ -2,10 +2,11 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
 const Token = require("../models/token"); 
+const User = require("../models/user"); 
 
 
 function generateToken(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const characters = '0123456789';
     let token = '';
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
@@ -48,7 +49,7 @@ router.post('/codes/generate', async (req, res) => {
 
 
 
-router.get('/codes/verify', async (req, res) => {
+router.post('/codes/verify', async (req, res) => {
     const { token } = req.body;
 
     if(!token) {
@@ -59,17 +60,28 @@ router.get('/codes/verify', async (req, res) => {
         const existingToken = await Token.findOneAndDelete({ token });
 
         if (!existingToken) {
-            res.status(404).json({ message: 'Token no encontrado' });
+            return res.status(404).json({ message: 'Token no encontrado' });
         }
 
-        await Token.deleteOne({ token });
+        const user = await User.findById(existingToken.generatedBy);
 
-        res.json({ vacancy: existingToken.vacancy, generatedBy: existingToken.generatedBy, contactMethod: existingToken.contactMethod });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        res.json({
+            company: existingToken.company,
+            vacancy: existingToken.vacancy,
+            medium: existingToken.medium,
+            subject: existingToken.subject,
+            generatedBy: user.name + ' ' + user.lastname,
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(401).json({ message: 'Token inválido' });
+        console.log(error);
+        res.status(500).json({ message: 'Error al verificar el token' });
     }
 });
+
 
 module.exports = router;
