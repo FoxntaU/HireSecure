@@ -4,16 +4,16 @@ import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react";
 import { FormEvent } from "react";
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Generar() {
   const { toast } = useToast();
   const cookies = useCookies();
   const [loading, setLoading] = useState(true);
   const [jwt, setJwt] = useState("");
-
+  const [code, setCode] = useState<string | null>();
   const router = useRouter();
 
   useEffect(() => {
@@ -46,21 +46,29 @@ export default function Generar() {
     const expirationDate = formData.get("expirationDate");
     const expirationTime = formData.get("expirationTime");
     const generatedBy = cookies.get("token");
-    console.log("generatedBy", generatedBy);
 
     const response = await fetch("http://localhost:9000/api/codes/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company, vacancy, medium, subject, expirationDate, expirationTime, generatedBy }),
+      body: JSON.stringify({
+        company,
+        vacancy,
+        medium,
+        subject,
+        expirationDate,
+        expirationTime,
+        generatedBy,
+      }),
     });
 
     if (response.ok) {
       toast({
-        title: "Generacion de codigo exitoso"
-      })
+        title: "Generacion de codigo exitoso",
+      });
       const data = await response.json();
-      router.push(`/code?token=${data.token}`);
-
+      setCode(data.token);
+      // router.push(`/code?token=${data.token}`);
+      setLoading(false);
     } else {
       // Handle errors
       console.log(response);
@@ -68,18 +76,39 @@ export default function Generar() {
         title: "Error al generar codigo",
         description: "Por favor, verifica tus datos",
         variant: "destructive",
-      })
+      });
       setLoading(false);
     }
   }
 
-  return (
-    <div className="flex content-center justify-center flex-col items-center">
-      <h1 className="font-extrabold text-4xl text-blue-950 mb-5">
-        Genera tu codigo
-      </h1>
+  const resetForm = () => {
+    setCode(null);
+    setLoading(false);
+  };
 
-          <form className="bg-slate-100 p-10 flex justify-between flex-col rounded-sm max-w-md w-11/12" onSubmit={handleSubmit}>
+  return (
+    <div className="flex justify-start min-h-screen items-center ">
+      <form
+        className="bg-slate-100 p-10 flex justify-between flex-col rounded-sm max-w-md w-11/12"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="font-extrabold text-4xl text-blue-950 mb-5">
+          {code != null ? (
+            <h1>Codigo generado correctamente</h1>
+          ) : (
+            <h1>Generar un nuevo codigo</h1>
+          )}
+        </h1>
+        {code != null ? (
+          <div className="space-y-4  ">
+            <h1 className="text-5xl font-bold text-green-600">{code}</h1>
+
+            <Button type="submit" disabled={loading} onClick={resetForm}>
+              Generar un nuevo codigo
+            </Button>
+          </div>
+        ) : (
+          <div>
             <div className="space-y-4  ">
               <div>
                 <label htmlFor="company">Empresa: </label>
@@ -115,11 +144,10 @@ export default function Generar() {
                 {loading ? <Loader2 size={24} /> : null}
                 {loading ? "Cargando..." : "Generar código"}
               </Button>
-
             </div>
-          </form>
-
-
+          </div>
+        )}
+      </form>
     </div>
   );
 }
