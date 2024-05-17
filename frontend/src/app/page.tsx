@@ -1,73 +1,131 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Loader2 } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useCookies } from 'next-client-cookies';
+import Image from "next/image";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 export default function Home() {
-  const { toast } = useToast();
+  interface TokenInfoType {
+    company: string;
+    vacancy: string;
+    subject: string;
+    medium: string;
+    generatedBy: string;
+  }
+
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const cookies = useCookies();
+  const [tokenInfo, setTokenInfo] = useState<TokenInfoType | null>(null);
+  const [error, setError] = useState(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
+  const onCompleteOtp = async (otp: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:9000/api/codes/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: otp }),
+      });
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("Password");
-
-    const response = await fetch("http://localhost:9000/api/users/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (response.ok) {
-      toast({
-        title: "Inicio de sesión exitoso",
-        description: "Bienvenido a HireSecure",
-      })
+      if (!response.ok) {
+        console.log("Error al verificar el código");
+        setError(true);
+        setLoading(false);
+        return;
+      }
 
       const data = await response.json();
-
-      cookies.set("token", data.token);
-      router.push("/generar");
-    } else {
-      // Handle errors
-      toast({
-        title: "Error al iniciar sesión",
-        description: "Por favor, verifica tus datos",
-        variant: "destructive",
-      })
+      setTokenInfo(data);
       setLoading(false);
+      console.log(data);
+    } catch (error) {
+      setLoading(false);
+      console.log("Error al verificar el código");
     }
-  }
+  };
+
   return (
-    <form className="flex justify-between min-h-screen items-center" onSubmit={handleSubmit}>
-      <div className="">
-        <h1 className="text-7xl text-blue-950 font-extrabold max-w-lg">
-          Bienvenido a HireSecure
-        </h1>
-      </div>
-      <div className="bg-slate-100 p-10 flex justify-between flex-col rounded-sm h-96" >
-        <p className="font-bold text-xl text-blue-950">Ingresa tus datos</p>
+    <main>
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-12 items-center">
+            <Image
+              className=" dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
+              src="/logo.svg"
+              alt="Next.js Logo"
+              width={500}
+              height={500}
+              priority
+            />
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+              Vérifica fácilmente nuestros canales de comunicación
+            </p>
+          </div>
+          <div className="flex items-center justify-center ">
+            <div className="mb-4">
+              <InputOTP
+                maxLength={6}
+                onComplete={onCompleteOtp}
+                disabled={loading}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} className="bg-sky-50" />
+                </InputOTPGroup>
+                <InputOTPGroup>
+                  <InputOTPSlot index={1} className="bg-sky-50" />
+                </InputOTPGroup>
+                <InputOTPGroup>
+                  <InputOTPSlot index={2} className="bg-sky-50" />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} className="bg-sky-50" />
+                </InputOTPGroup>
+                <InputOTPGroup>
+                  <InputOTPSlot index={4} className="bg-sky-50" />
+                </InputOTPGroup>
+                <InputOTPGroup>
+                  <InputOTPSlot index={5} className="bg-sky-50" />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center text-center items-center">
+            <p className="text-xs text-gray-600">
+              Ingresa el código de 6 digitos que te compartió nuestro asesor.
+            </p>
 
-        <div className="space-y-4">
-          <Input placeholder="Correo" className="w-96" name="email" required type="email"/>
-          <Input placeholder="Contraseña" type="password" name="Password" required/>
+            {tokenInfo && (
+              <div className="bg-white p-4 rounded-md shadow-md w-80 mt-8">
+                <p className="text-blue-950 font-bold">
+                  Empresa: {tokenInfo.company}
+                </p>
+                <p className="text-blue-950 font-bold">
+                  Vacante: {tokenInfo.vacancy}
+                </p>
+                <p className="text-blue-950 font-bold">
+                  Asunto: {tokenInfo.subject}
+                </p>
+                <p className="text-blue-950 font-bold">
+                  Medio de comunicación: {tokenInfo.medium}
+                </p>
+                <p className="text-blue-950 font-bold">
+                  Generado por: {tokenInfo.generatedBy}
+                </p>
+              </div>
+            )}
+
+            {error && (
+              <p className="text-red-500 mt-8">
+                La información del token no fue encontrada
+              </p>
+            )}
+          </div>
         </div>
-
-        <Button type="submit" disabled={loading}>
-          {loading ? <Loader2 size={24} /> : null}
-          {loading ? "Cargando..." : "Ingresar"}
-        </Button>
-      </div>
-    </form>
+      </section>
+    </main>
   );
 }
