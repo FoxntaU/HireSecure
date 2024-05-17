@@ -7,6 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { FormEvent } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Generar() {
   const { toast } = useToast();
@@ -15,17 +24,48 @@ export default function Generar() {
   const [jwt, setJwt] = useState("");
   const [code, setCode] = useState<string | null>();
   const router = useRouter();
+  const [reports, setReports] = useState<
+    {
+      description: string;
+      assets: string[];
+      platform: string;
+      createdBy: string;
+      createdAt: string;
+    }[]
+  >([]);
+
+  const [loadingReports, setLoadingReports] = useState(true);
 
   useEffect(() => {
     const _cookiesToken = cookies.get("token");
     if (_cookiesToken) {
       setJwt(_cookiesToken);
       setLoading(false);
+      getReports();
     } else {
       router.push("/");
     }
   }, [cookies]);
 
+  const getReports = async () => {
+    const response = await fetch(
+      "http://localhost:9000/api/report/unverified",
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (!response.ok) {
+      console.log("Error al verificar el código");
+      setLoadingReports(false);
+      return;
+    }
+
+    const data = await response.json();
+
+    setReports(data.reports);
+  };
   if (loading) {
     return (
       <div className="flex content-center justify-center">
@@ -86,10 +126,95 @@ export default function Generar() {
     setLoading(false);
   };
 
+  const renderReports = () => {
+    if (reports.length === 0) {
+      return (
+        <div>
+          <p>No hay reportes para mostrar</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex">
+        {reports.map((item, index) => {
+          return (
+            <Dialog key={index}>
+              <DialogTrigger className="m-4 md:w-1/3">
+                <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
+                  <Image
+                    src={decodeURIComponent(item.assets[0])}
+                    alt={item.description}
+                    width={500}
+                    height={200}
+                  />
+                  <div className="p-6">
+                    <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1"></h2>
+                    <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
+                      Reporte del{" "}
+                      {new Intl.DateTimeFormat("es-CO", {
+                        dateStyle: "long",
+                      }).format(new Date(item.createdAt))}{" "}
+                      en {item.platform}
+                    </h1>
+                    <p className="leading-relaxed mb-3 overflow-hidden whitespace-nowrap text-ellipsis">
+                      {item.description}
+                    </p>
+                    <div className="flex items-center flex-wrap ">
+                      <a className="text-green-600 inline-flex items-center md:mb-2 lg:mb-0 ">
+                        Verificar
+                        <svg
+                          className="w-4 h-4 ml-2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          fill="none"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14"></path>
+                          <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogTitle>
+                  {" "}
+                  Reporte del{" "}
+                  {new Intl.DateTimeFormat("es-CO", {
+                    dateStyle: "long",
+                  }).format(new Date(item.createdAt))}{" "}
+                  en {item.platform}
+                </DialogTitle>
+                <DialogDescription>
+                  <p>{item.description}</p>
+                  <h1 className="text-xl my-2 font-bold">Evidencia</h1>
+                  <Image
+                    src={decodeURIComponent(item.assets[0])}
+                    alt={item.description}
+                    width={500}
+                    height={200}
+                  />
+                </DialogDescription>
+                <DialogFooter>
+                  <Button type="submit" className="bg-red-600">Elminiar</Button>
+                  <Button type="submit">Verificar</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div className="flex justify-start min-h-screen items-center ">
+    <div className="flex justify-between min-h-screen items-center">
       <form
-        className="bg-slate-100 p-10 flex justify-between flex-col rounded-sm max-w-md w-11/12"
+        className="bg-slate-100 p-10 flex justify-between flex-col rounded-sm w-2/6"
         onSubmit={handleSubmit}
       >
         <h1 className="font-extrabold text-4xl text-blue-950 mb-5">
@@ -148,6 +273,13 @@ export default function Generar() {
           </div>
         )}
       </form>
+
+      <div className="w-4/6">
+        <h1 className="font-bold text-3xl ml-4 text-[#70ECD4]">
+          Ultimos reportes
+        </h1>
+        {renderReports()}
+      </div>
     </div>
   );
 }

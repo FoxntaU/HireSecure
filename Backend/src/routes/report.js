@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Report = require("../models/report");
+const report = require("../models/report");
 
 router.post("/report", async (req, res) => {
   const { platform, description, assets, createdBy } = req.body;
@@ -28,6 +29,23 @@ router.post("/report", async (req, res) => {
     console.log(error);
     res.status(500).json({
       message: "Algo salio mal, por favor intenta de nuevo",
+    });
+  }
+});
+
+router.get("/report/unverified", async (req, res) => {
+  try {
+    const unverifiedReports = await report.find({
+      verified: false
+    });
+
+    res.json({
+      reports: unverifiedReports,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Algo salio mal, intentalo de nuevo",
     });
   }
 });
