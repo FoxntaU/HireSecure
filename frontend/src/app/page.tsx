@@ -260,20 +260,24 @@ export default function Home() {
 
       <section className="relative">
         <div className="bg-[#F1F9FD] p-4 rounded-md mb-10">
-          <h1 className="text-5xl font-bold text-[#090467] my-10 pl-4">¿Cómo funciona?</h1>
+          <h1 className="text-5xl font-bold text-[#090467] my-6 pl-4">
+            ¿Cómo funciona?
+          </h1>
 
-          <ol type="1" className="my-4 max-w-md  pl-4">
+          <ol type="1" className="my-4 max-w-md pl-4 space-y-2">
             <li>
-              1. <span className="font-bold">Generamos</span> códigos únicos
+              1. <span className="font-bold text-[#00DF98]">Generamos</span> códigos únicos
               cada vez que nos comunicamos contigo
             </li>
             <li>
-              2. Cuando generamos un código, incluimos información de nuestro
-              asesor, medio de contácto y más.
+              2. Cuando generamos un código,{" "}
+              <span className="font-bold text-[#00DF98]">incluimos información</span> de
+              nuestro asesor, medio de contácto y más.
             </li>
             <li>
-              3. Una vez consultas un código, no puede volver a ser usado. Así
-              evitamos que sean usados por personas mal intencionadas
+              3. Una vez consultas un código,{" "}
+              <span className="font-bold text-[#00DF98]">no puede</span> volver a ser usado.
+              Así evitamos que sean usados por personas mal intencionadas
             </li>
           </ol>
         </div>
