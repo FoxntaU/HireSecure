@@ -231,6 +231,7 @@ export default function Generar() {
                     alt={item.description}
                     width={500}
                     height={200}
+                    className="rounded-md"
                   />
                 </DialogDescription>
                 <DialogFooter>
