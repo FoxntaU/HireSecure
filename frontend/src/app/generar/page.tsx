@@ -127,6 +127,11 @@ export default function Generar() {
   };
 
   const renderReports = () => {
+    if (loadingReports) {
+      <div>
+        <p>Cargando reportes...</p>
+      </div>
+    }
     if (reports.length === 0) {
       return (
         <div>

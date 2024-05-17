@@ -36,7 +36,7 @@ router.post("/report", async (req, res) => {
 router.get("/report/unverified", async (req, res) => {
   try {
     const unverifiedReports = await report.find({
-      verified: false
+      verified: false,
     });
 
     res.json({
@@ -49,5 +49,68 @@ router.get("/report/unverified", async (req, res) => {
     });
   }
 });
+
+router.put("/report/verify", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Faltan algunos de los campos requeridos",
+    });
+  }
+
+  try {
+    Report.findByIdAndUpdate(id, {
+      verified: true,
+    })
+      .then(() => {
+        res.status(200).json({
+          message: "Actualizado",
+        });
+      })
+      .catch(() => {
+        res.status(500).json({
+          message: "Algo salio mal, intentalo de nuevo",
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Algo salio mal, por favor intenta de nuevo",
+    });
+  }
+});
+
+router.delete("/report", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Faltan algunos de los campos requeridos",
+    });
+  }
+
+  try {
+    Report.findByIdAndDelete(id, {
+      verified: true,
+    })
+      .then(() => {
+        res.status(200).json({
+          message: "Elminiado correctamente",
+        });
+      })
+      .catch(() => {
+        res.status(500).json({
+          message: "Algo salio mal, intentalo de nuevo",
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Algo salio mal, por favor intenta de nuevo",
+    });
+  }
+});
+
 
 module.exports = router;
