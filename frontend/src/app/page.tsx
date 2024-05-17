@@ -39,13 +39,11 @@ export default function Home() {
       _id: string;
     }[]
   >([]);
+  const [loadingReports, setLoadingReports] = useState(true);
 
   useEffect(() => {
     getReports();
   }, []);
-
-  const [loadingReports, setLoadingReports] = useState(true);
-  const [loadingDialog, setLoadingDialog] = useState(false);
 
   const onCompleteOtp = async (otp: string) => {
     try {
@@ -66,7 +64,6 @@ export default function Home() {
       const data = await response.json();
       setTokenInfo(data);
       setLoading(false);
-      console.log(data);
     } catch (error) {
       setLoading(false);
       console.log("Error al verificar el código");
@@ -86,8 +83,6 @@ export default function Home() {
     }
 
     const data = await response.json();
-
-    console.log(data);
     setReports(data.reports);
   };
 
@@ -97,6 +92,7 @@ export default function Home() {
         <p>Cargando reportes...</p>
       </div>;
     }
+
     if (reports.length === 0) {
       return (
         <div>
@@ -181,26 +177,29 @@ export default function Home() {
   return (
     <main>
       <section className="text-gray-600 body-font">
-        <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-col text-center w-full mb-12 items-center">
+        <div className="container mb-9 mx-auto flex justify-between ">
+          <div className="flex flex-col text-center w-full items-start">
             <Image
-              className=" dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-              src="/logo.svg"
+              className=" dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert "
+              src="/asset2.svg"
               alt="Next.js Logo"
               width={500}
               height={500}
               priority
             />
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+          </div>
+          <div className="flex flex-col items-center justify-center w-full">
+            <p className="lg:w-2/3 mx-auto leading-relaxed mb-4 text-2xl font-bold text-center text-[#090467]">
               Vérifica fácilmente nuestros canales de comunicación
             </p>
-          </div>
-          <div className="flex items-center justify-center ">
             <div className="mb-4">
               <InputOTP
                 maxLength={6}
                 onComplete={onCompleteOtp}
                 disabled={loading}
+                onChange={() => {
+                  setTokenInfo(null);
+                }}
               >
                 <InputOTPGroup>
                   <InputOTPSlot index={0} className="bg-sky-50" />
@@ -223,37 +222,42 @@ export default function Home() {
                 </InputOTPGroup>
               </InputOTP>
             </div>
-          </div>
-          <div className="flex flex-col justify-center text-center items-center">
+
             <p className="text-xs text-gray-600">
               Ingresa el código de 6 digitos que te compartió nuestro asesor.
             </p>
+            <div className="flex flex-col justify-center text-center items-center">
+              {tokenInfo && (
+                <div className="bg-white p-4 rounded-md shadow-md w-80 mt-8">
+                  <p className="text-blue-950 ">
+                    <span className="font-bold">Empresa:</span>{" "}
+                    {tokenInfo.company}
+                  </p>
+                  <p className="text-blue-950 ">
+                    <span className="font-bold">Vacante:</span>{" "}
+                    {tokenInfo.vacancy}
+                  </p>
+                  <p className="text-blue-950">
+                    <span className="font-bold">Asunto:</span>{" "}
+                    {tokenInfo.subject}
+                  </p>
+                  <p className="text-blue-950">
+                    <span className="font-bold">Medio de comunicación:</span>{" "}
+                    {tokenInfo.medium}
+                  </p>
+                  <p className="text-blue-950 ">
+                    <span className="font-bold">Generado por:</span>{" "}
+                    {tokenInfo.generatedBy}
+                  </p>
+                </div>
+              )}
 
-            {tokenInfo && (
-              <div className="bg-white p-4 rounded-md shadow-md w-80 mt-8">
-                <p className="text-blue-950 font-bold">
-                  Empresa: {tokenInfo.company}
+              {error && (
+                <p className="text-red-500 mt-8">
+                  La información del token no fue encontrada
                 </p>
-                <p className="text-blue-950 font-bold">
-                  Vacante: {tokenInfo.vacancy}
-                </p>
-                <p className="text-blue-950 font-bold">
-                  Asunto: {tokenInfo.subject}
-                </p>
-                <p className="text-blue-950 font-bold">
-                  Medio de comunicación: {tokenInfo.medium}
-                </p>
-                <p className="text-blue-950 font-bold">
-                  Generado por: {tokenInfo.generatedBy}
-                </p>
-              </div>
-            )}
-
-            {error && (
-              <p className="text-red-500 mt-8">
-                La información del token no fue encontrada
-              </p>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -266,18 +270,21 @@ export default function Home() {
 
           <ol type="1" className="my-4 max-w-md pl-4 space-y-2">
             <li>
-              1. <span className="font-bold text-[#00DF98]">Generamos</span> códigos únicos
-              cada vez que nos comunicamos contigo
+              1. <span className="font-bold text-[#00DF98]">Generamos</span>{" "}
+              códigos únicos cada vez que nos comunicamos contigo
             </li>
             <li>
               2. Cuando generamos un código,{" "}
-              <span className="font-bold text-[#00DF98]">incluimos información</span> de
-              nuestro asesor, medio de contácto y más.
+              <span className="font-bold text-[#00DF98]">
+                incluimos información
+              </span>{" "}
+              de nuestro asesor, medio de contácto y más.
             </li>
             <li>
               3. Una vez consultas un código,{" "}
-              <span className="font-bold text-[#00DF98]">no puede</span> volver a ser usado.
-              Así evitamos que sean usados por personas mal intencionadas
+              <span className="font-bold text-[#00DF98]">no puede</span> volver
+              a ser usado. Así evitamos que sean usados por personas mal
+              intencionadas
             </li>
           </ol>
         </div>
