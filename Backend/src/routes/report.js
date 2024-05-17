@@ -50,6 +50,23 @@ router.get("/report/unverified", async (req, res) => {
   }
 });
 
+router.get("/report/verified", async (req, res) => {
+  try {
+    const unverifiedReports = await report.find({
+      verified: true,
+    });
+
+    res.json({
+      reports: unverifiedReports,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Algo salio mal, intentalo de nuevo",
+    });
+  }
+});
+
 router.post("/report/verify", async (req, res) => {
   const { id } = req.body;
 
