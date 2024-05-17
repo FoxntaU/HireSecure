@@ -50,7 +50,7 @@ router.get("/report/unverified", async (req, res) => {
   }
 });
 
-router.put("/report/verify", async (req, res) => {
+router.post("/report/verify", async (req, res) => {
   const { id } = req.body;
 
   if (!id) {

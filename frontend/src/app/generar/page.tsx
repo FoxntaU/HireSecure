@@ -31,10 +31,12 @@ export default function Generar() {
       platform: string;
       createdBy: string;
       createdAt: string;
+      _id: string;
     }[]
   >([]);
 
   const [loadingReports, setLoadingReports] = useState(true);
+  const [loadingDialog, setLoadingDialog] = useState(false);
 
   useEffect(() => {
     const _cookiesToken = cookies.get("token");
@@ -66,6 +68,7 @@ export default function Generar() {
 
     setReports(data.reports);
   };
+
   if (loading) {
     return (
       <div className="flex content-center justify-center">
@@ -121,6 +124,32 @@ export default function Generar() {
     }
   }
 
+  async function handleVerify(id: string) {
+    const response = await fetch("http://localhost:9000/api/report/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        id,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok) {
+      toast({
+        title: "Reporte verificado!",
+        description: "El reporte ha sido verificado correctamente",
+        variant: "default",
+      });
+      window.location.reload();
+    } else {
+      console.log(response);
+      toast({
+        title: "Algo salio mal",
+        description: "No sabemos que paso, pero algo no funciono :/",
+        variant: "destructive",
+      });
+      setLoadingDialog(false);
+    }
+  }
   const resetForm = () => {
     setCode(null);
     setLoading(false);
@@ -130,7 +159,7 @@ export default function Generar() {
     if (loadingReports) {
       <div>
         <p>Cargando reportes...</p>
-      </div>
+      </div>;
     }
     if (reports.length === 0) {
       return (
@@ -205,8 +234,17 @@ export default function Generar() {
                   />
                 </DialogDescription>
                 <DialogFooter>
-                  <Button type="submit" className="bg-red-600">Elminiar</Button>
-                  <Button type="submit">Verificar</Button>
+                  <Button type="submit" className="bg-red-600">
+                    Elminiar
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      handleVerify(item._id);
+                    }}
+                  >
+                    Verificar
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
